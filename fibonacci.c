@@ -47,6 +47,11 @@ int fibonacciInt(int n){
 int main(void) {
 	struct timespec inicio, fim;
 	clock_gettime(CLOCK_MONOTONIC, &inicio);
+<<<<<<< HEAD
+=======
+    int retorno1 =0;
+    int retorno2=0;
+>>>>>>> 1998441 (add: fibonacci)
 
 	fibonacciRec(42);
 
@@ -58,11 +63,19 @@ int main(void) {
 
     clock_gettime(CLOCK_MONOTONIC, &inicio);
 
+<<<<<<< HEAD
 	fibonacciInt(42);
 
 	clock_gettime(CLOCK_MONOTONIC, &fim);
     double tempo_decorrido2 = (fim.tv_sec - inicio.tv_sec)+ (fim.tv_nsec - inicio.tv_nsec) / 1e9;
     printf("tempo do it %.6f em segundos\n",tempo_decorrido2);
+=======
+	retorno2= fibonacciInt(42);
+
+	clock_gettime(CLOCK_MONOTONIC, &fim);
+    double tempo_decorrido2 = (fim.tv_sec - inicio.tv_sec)+ (fim.tv_nsec - inicio.tv_nsec) / 1e9;
+    printf("tempo do it %.6f em segundos\n %d",tempo_decorrido2,retorno2);
+>>>>>>> 1998441 (add: fibonacci)
 	return 0;
 	
 }
