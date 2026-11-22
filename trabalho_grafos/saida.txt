@@ -1,0 +1,171 @@
+==============================================================
+ 1) REPRESENTACAO DO GRAFO  (9 vertices, 14 arestas)
+==============================================================
+
+Matriz de adjacencias (1 = ha aresta, 0 = nao ha) [PDF 10, slide 20]:
+       0  1  2  3  4  5  6  7  8
+  0 |  0  1  0  0  0  0  0  1  0
+  1 |  1  0  1  0  0  0  0  1  0
+  2 |  0  1  0  1  0  1  0  0  1
+  3 |  0  0  1  0  1  1  0  0  0
+  4 |  0  0  0  1  0  1  0  0  0
+  5 |  0  0  1  1  1  0  1  0  0
+  6 |  0  0  0  0  0  1  0  1  1
+  7 |  1  1  0  0  0  0  1  0  1
+  8 |  0  0  1  0  0  0  1  1  0
+
+Matriz de adjacencias com pesos (0 = nao ha aresta):
+       0  1  2  3  4  5  6  7  8
+  0 |  0  4  0  0  0  0  0  8  0
+  1 |  4  0  8  0  0  0  0 11  0
+  2 |  0  8  0  7  0  4  0  0  2
+  3 |  0  0  7  0  9 14  0  0  0
+  4 |  0  0  0  9  0 10  0  0  0
+  5 |  0  0  4 14 10  0  2  0  0
+  6 |  0  0  0  0  0  2  0  1  6
+  7 |  8 11  0  0  0  0  1  0  7
+  8 |  0  0  2  0  0  0  6  7  0
+
+Listas de adjacencias [PDF 10, slide 26] - (vizinho, peso):
+  [0]-> (1,  4) -> (7,  8) -> NULL
+  [1]-> (0,  4) -> (2,  8) -> (7, 11) -> NULL
+  [2]-> (1,  8) -> (3,  7) -> (5,  4) -> (8,  2) -> NULL
+  [3]-> (2,  7) -> (4,  9) -> (5, 14) -> NULL
+  [4]-> (3,  9) -> (5, 10) -> NULL
+  [5]-> (2,  4) -> (3, 14) -> (4, 10) -> (6,  2) -> NULL
+  [6]-> (5,  2) -> (7,  1) -> (8,  6) -> NULL
+  [7]-> (0,  8) -> (1, 11) -> (6,  1) -> (8,  7) -> NULL
+  [8]-> (2,  2) -> (6,  6) -> (7,  7) -> NULL
+
+==============================================================
+ 2) KRUSKAL - ARVORE GERADORA DE CUSTO MINIMO
+==============================================================
+  Arestas ordenadas por peso:
+    6-7(1) 2-8(2) 5-6(2) 0-1(4) 2-5(4) 6-8(6) 2-3(7) 7-8(7) 0-7(8) 1-2(8) 3-4(9) 4-5(10) 1-7(11) 3-5(14)
+
+  Passo 1: floresta inicial = 9 arvores {0} {1} ... {8}
+
+  Examina 6-7 (peso  1): Find(6)=6, Find(7)=7 -> INCLUI   (une duas arvores)   custo parcial = 1
+  Examina 2-8 (peso  2): Find(2)=2, Find(8)=8 -> INCLUI   (une duas arvores)   custo parcial = 3
+  Examina 5-6 (peso  2): Find(5)=5, Find(6)=6 -> INCLUI   (une duas arvores)   custo parcial = 5
+  Examina 0-1 (peso  4): Find(0)=0, Find(1)=1 -> INCLUI   (une duas arvores)   custo parcial = 9
+  Examina 2-5 (peso  4): Find(2)=2, Find(5)=6 -> INCLUI   (une duas arvores)   custo parcial = 13
+  Examina 6-8 (peso  6): Find(6)=2, Find(8)=2 -> REJEITA  (formaria ciclo)
+  Examina 2-3 (peso  7): Find(2)=2, Find(3)=3 -> INCLUI   (une duas arvores)   custo parcial = 20
+  Examina 7-8 (peso  7): Find(7)=2, Find(8)=2 -> REJEITA  (formaria ciclo)
+  Examina 0-7 (peso  8): Find(0)=0, Find(7)=2 -> INCLUI   (une duas arvores)   custo parcial = 28
+  Examina 1-2 (peso  8): Find(1)=2, Find(2)=2 -> REJEITA  (formaria ciclo)
+  Examina 3-4 (peso  9): Find(3)=2, Find(4)=4 -> INCLUI   (une duas arvores)   custo parcial = 37
+  4-5 (peso 10): nao examinada (arvore ja completa)
+  1-7 (peso 11): nao examinada (arvore ja completa)
+  3-5 (peso 14): nao examinada (arvore ja completa)
+
+  Vetor de pais da particao ao final (PDF 9, slide 15):
+      elemento:  0  1  2  3  4  5  6  7  8
+      ponteiro:  2  2 -1  2  2  6  2  2  2
+
+  Arvore geradora minima (8 arestas):
+    6 - 7  (peso 1)
+    2 - 8  (peso 2)
+    5 - 6  (peso 2)
+    0 - 1  (peso 4)
+    2 - 5  (peso 4)
+    2 - 3  (peso 7)
+    0 - 7  (peso 8)
+    3 - 4  (peso 9)
+  Custo total = 37
+
+==============================================================
+ 3) DIJKSTRA - MENOR DISTANCIA DO NO 8 AOS DEMAIS
+==============================================================
+  Inicio: origem = 8
+      vertice:    0    1    2    3    4    5    6    7    8
+      dist   :  inf  inf  inf  inf  inf  inf  inf  inf    0
+      visit. :    .    .    .    .    .    .    .    .    .
+
+  Passo 1: no corrente = 8 (dist = 0)
+    modifica distancia do vertice 2:   inf -> 2  (0 + 2, via 8)
+    modifica distancia do vertice 6:   inf -> 6  (0 + 6, via 8)
+    modifica distancia do vertice 7:   inf -> 7  (0 + 7, via 8)
+      vertice:    0    1    2    3    4    5    6    7    8
+      dist   :  inf  inf    2  inf  inf  inf    6    7    0
+      visit. :    .    .    .    .    .    .    .    .    x
+
+  Passo 2: no corrente = 2 (dist = 2)
+    modifica distancia do vertice 1:   inf -> 10  (2 + 8, via 2)
+    modifica distancia do vertice 3:   inf -> 9  (2 + 7, via 2)
+    modifica distancia do vertice 5:   inf -> 6  (2 + 4, via 2)
+    ignora vertice 8 (ja visitado)
+      vertice:    0    1    2    3    4    5    6    7    8
+      dist   :  inf   10    2    9  inf    6    6    7    0
+      visit. :    .    .    x    .    .    .    .    .    x
+
+  Passo 3: no corrente = 5 (dist = 6)
+    ignora vertice 2 (ja visitado)
+    mantem distancia do vertice 3: 9 <= 6 + 14
+    modifica distancia do vertice 4:   inf -> 16  (6 + 10, via 5)
+    mantem distancia do vertice 6: 6 <= 6 + 2
+      vertice:    0    1    2    3    4    5    6    7    8
+      dist   :  inf   10    2    9   16    6    6    7    0
+      visit. :    .    .    x    .    .    x    .    .    x
+
+  Passo 4: no corrente = 6 (dist = 6)
+    ignora vertice 5 (ja visitado)
+    mantem distancia do vertice 7: 7 <= 6 + 1
+    ignora vertice 8 (ja visitado)
+      vertice:    0    1    2    3    4    5    6    7    8
+      dist   :  inf   10    2    9   16    6    6    7    0
+      visit. :    .    .    x    .    .    x    x    .    x
+
+  Passo 5: no corrente = 7 (dist = 7)
+    modifica distancia do vertice 0:   inf -> 15  (7 + 8, via 7)
+    mantem distancia do vertice 1: 10 <= 7 + 11
+    ignora vertice 6 (ja visitado)
+    ignora vertice 8 (ja visitado)
+      vertice:    0    1    2    3    4    5    6    7    8
+      dist   :   15   10    2    9   16    6    6    7    0
+      visit. :    .    .    x    .    .    x    x    x    x
+
+  Passo 6: no corrente = 3 (dist = 9)
+    ignora vertice 2 (ja visitado)
+    mantem distancia do vertice 4: 16 <= 9 + 9
+    ignora vertice 5 (ja visitado)
+      vertice:    0    1    2    3    4    5    6    7    8
+      dist   :   15   10    2    9   16    6    6    7    0
+      visit. :    .    .    x    x    .    x    x    x    x
+
+  Passo 7: no corrente = 1 (dist = 10)
+    modifica distancia do vertice 0:    15 -> 14  (10 + 4, via 1)
+    ignora vertice 2 (ja visitado)
+    ignora vertice 7 (ja visitado)
+      vertice:    0    1    2    3    4    5    6    7    8
+      dist   :   14   10    2    9   16    6    6    7    0
+      visit. :    .    x    x    x    .    x    x    x    x
+
+  Passo 8: no corrente = 0 (dist = 14)
+    ignora vertice 1 (ja visitado)
+    ignora vertice 7 (ja visitado)
+      vertice:    0    1    2    3    4    5    6    7    8
+      dist   :   14   10    2    9   16    6    6    7    0
+      visit. :    x    x    x    x    .    x    x    x    x
+
+  Passo 9: no corrente = 4 (dist = 16)
+    ignora vertice 3 (ja visitado)
+    ignora vertice 5 (ja visitado)
+      vertice:    0    1    2    3    4    5    6    7    8
+      dist   :   14   10    2    9   16    6    6    7    0
+      visit. :    x    x    x    x    x    x    x    x    x
+
+  Nao ha mais vertices nao visitados - FIM!
+  Conjunto de visitados = { 0 1 2 3 4 5 6 7 8 }
+
+  Resultado final:
+    8 -> 0 : distancia 14   caminho: 8 -> 2 -> 1 -> 0
+    8 -> 1 : distancia 10   caminho: 8 -> 2 -> 1
+    8 -> 2 : distancia  2   caminho: 8 -> 2
+    8 -> 3 : distancia  9   caminho: 8 -> 2 -> 3
+    8 -> 4 : distancia 16   caminho: 8 -> 2 -> 5 -> 4
+    8 -> 5 : distancia  6   caminho: 8 -> 2 -> 5
+    8 -> 6 : distancia  6   caminho: 8 -> 6
+    8 -> 7 : distancia  7   caminho: 8 -> 7
+    8 -> 8 : distancia  0   caminho: 8
