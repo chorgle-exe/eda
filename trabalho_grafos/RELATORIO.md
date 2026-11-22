@@ -39,21 +39,6 @@ Como o grafo é não dirigido, a matriz é **simétrica** (slide 21).
   8 |  0  0  1  0  0  0  1  1  0
 ```
 
-Como o grafo é ponderado, também imprimimos a versão com pesos (0 = sem aresta):
-
-```
-       0  1  2  3  4  5  6  7  8
-  0 |  0  4  0  0  0  0  0  8  0
-  1 |  4  0  8  0  0  0  0 11  0
-  2 |  0  8  0  7  0  4  0  0  2
-  3 |  0  0  7  0  9 14  0  0  0
-  4 |  0  0  0  9  0 10  0  0  0
-  5 |  0  0  4 14 10  0  2  0  0
-  6 |  0  0  0  0  0  2  0  1  6
-  7 |  8 11  0  0  0  0  1  0  7
-  8 |  0  0  2  0  0  0  6  7  0
-```
-
 ### 1.2 Listas de adjacências
 
 Usamos exatamente a estrutura do lab (PDF 10, slide 26): `struct _grafo` com `nv`, `na` e
@@ -99,33 +84,21 @@ Implementação:
 ### 2.2 Saída gerada
 
 ```
-  Arestas ordenadas por peso:
-    6-7(1) 2-8(2) 5-6(2) 0-1(4) 2-5(4) 6-8(6) 2-3(7) 7-8(7) 0-7(8) 1-2(8) 3-4(9) 4-5(10) 1-7(11) 3-5(14)
-
-  Passo 1: floresta inicial = 9 arvores {0} {1} ... {8}
-
-  Examina 6-7 (peso  1): Find(6)=6, Find(7)=7 -> INCLUI   (une duas arvores)   custo parcial = 1
-  Examina 2-8 (peso  2): Find(2)=2, Find(8)=8 -> INCLUI   (une duas arvores)   custo parcial = 3
-  Examina 5-6 (peso  2): Find(5)=5, Find(6)=6 -> INCLUI   (une duas arvores)   custo parcial = 5
-  Examina 0-1 (peso  4): Find(0)=0, Find(1)=1 -> INCLUI   (une duas arvores)   custo parcial = 9
-  Examina 2-5 (peso  4): Find(2)=2, Find(5)=6 -> INCLUI   (une duas arvores)   custo parcial = 13
-  Examina 6-8 (peso  6): Find(6)=2, Find(8)=2 -> REJEITA  (formaria ciclo)
-  Examina 2-3 (peso  7): Find(2)=2, Find(3)=3 -> INCLUI   (une duas arvores)   custo parcial = 20
-  Examina 7-8 (peso  7): Find(7)=2, Find(8)=2 -> REJEITA  (formaria ciclo)
-  Examina 0-7 (peso  8): Find(0)=0, Find(7)=2 -> INCLUI   (une duas arvores)   custo parcial = 28
-  Examina 1-2 (peso  8): Find(1)=2, Find(2)=2 -> REJEITA  (formaria ciclo)
-  Examina 3-4 (peso  9): Find(3)=2, Find(4)=4 -> INCLUI   (une duas arvores)   custo parcial = 37
-  4-5 (peso 10): nao examinada (arvore ja completa)
-  1-7 (peso 11): nao examinada (arvore ja completa)
-  3-5 (peso 14): nao examinada (arvore ja completa)
-
-  Arvore geradora minima (8 arestas):
-    6 - 7 (1)   2 - 8 (2)   5 - 6 (2)   0 - 1 (4)
-    2 - 5 (4)   2 - 3 (7)   0 - 7 (8)   3 - 4 (9)
+2) KRUSKAL - ARVORE GERADORA MINIMA
+  6 - 7  (peso 1)
+  2 - 8  (peso 2)
+  5 - 6  (peso 2)
+  0 - 1  (peso 4)
+  2 - 5  (peso 4)
+  2 - 3  (peso 7)
+  0 - 7  (peso 8)
+  3 - 4  (peso 9)
   Custo total = 37
 ```
 
 ### 2.3 Caminho percorrido, passo a passo
+
+O programa imprime só o resultado; abaixo está a execução do algoritmo detalhada, aresta por aresta.
 
 Floresta inicial: {0} {1} {2} {3} {4} {5} {6} {7} {8}.
 
@@ -148,9 +121,7 @@ Observações:
 - **Empates de peso**: 2–8 e 5–6 (peso 2), 0–1 e 2–5 (peso 4), 2–3 e 7–8 (peso 7), 0–7 e 1–2 (peso 8).
   Ordenamos por (peso, u, v) para a saída ser sempre a mesma. Outra ordem de desempate poderia
   produzir outra árvore (por exemplo, com 1–2 no lugar de 0–7), mas **o custo mínimo é sempre 37**.
-- A partição ao final tem raiz 2 (`pai[2] = -1`) e o vetor de pais é
-  `2 2 -1 2 2 6 2 2 2`: a compressão de trajetória fez quase todos apontarem direto para a raiz;
-  só o 5 ainda aponta para 6 porque nenhum `Find` passou por ele depois da união.
+- Uma aresta é rejeitada quando `Find(u) == Find(v)`, ou seja, u e v já estão na mesma árvore e incluí-la formaria um ciclo.
 
 Árvore final:
 
@@ -189,22 +160,25 @@ Implementação:
 - O nó corrente seguinte é escolhido por busca linear, então a complexidade é O(V²) (slide 21: depende da implementação de Q).
 - Empate de distâncias: escolhe o de menor índice.
 
-### 3.2 Saída gerada (resumo; a saída completa está em `saida.txt`)
+### 3.2 Saída gerada
+
+Para cada nó: menor distância a partir do nó 8 e, entre parênteses, o caminho correspondente.
 
 ```
-  Resultado final:
-    8 -> 0 : distancia 14   caminho: 8 -> 2 -> 1 -> 0
-    8 -> 1 : distancia 10   caminho: 8 -> 2 -> 1
-    8 -> 2 : distancia  2   caminho: 8 -> 2
-    8 -> 3 : distancia  9   caminho: 8 -> 2 -> 3
-    8 -> 4 : distancia 16   caminho: 8 -> 2 -> 5 -> 4
-    8 -> 5 : distancia  6   caminho: 8 -> 2 -> 5
-    8 -> 6 : distancia  6   caminho: 8 -> 6
-    8 -> 7 : distancia  7   caminho: 8 -> 7
-    8 -> 8 : distancia  0   caminho: 8
+3) DIJKSTRA - MENOR DISTANCIA DO NO 8 AOS DEMAIS
+  8 -> 0 : 14   (8 -> 2 -> 1 -> 0)
+  8 -> 1 : 10   (8 -> 2 -> 1)
+  8 -> 2 :  2   (8 -> 2)
+  8 -> 3 :  9   (8 -> 2 -> 3)
+  8 -> 4 : 16   (8 -> 2 -> 5 -> 4)
+  8 -> 5 :  6   (8 -> 2 -> 5)
+  8 -> 6 :  6   (8 -> 6)
+  8 -> 7 :  7   (8 -> 7)
 ```
 
 ### 3.3 Caminho percorrido, passo a passo
+
+O programa imprime só o resultado; abaixo está a execução do algoritmo detalhada, nó por nó.
 
 Início: `dist = [∞ ∞ ∞ ∞ ∞ ∞ ∞ ∞ 0]` (índices 0..8).
 
@@ -235,9 +209,9 @@ Pontos que merecem destaque:
 
 **Funciona:**
 
-- Montagem do grafo do enunciado com a struct de listas de adjacências do lab, e impressão da matriz (0/1 e com pesos) e das listas.
-- Kruskal com Union-Find (união por altura + compressão de trajetória): gera a árvore de custo **37** com as 8 arestas corretas e mostra cada aresta incluída/rejeitada.
-- Dijkstra a partir do nó 8: distâncias corretas para todos os nós, com rastreamento passo a passo e o caminho de cada nó.
+- Montagem do grafo do enunciado com a struct de listas de adjacências do lab, e impressão da matriz e das listas.
+- Kruskal com Union-Find (união por altura + compressão de trajetória): gera a árvore de custo **37** com as 8 arestas corretas.
+- Dijkstra a partir do nó 8: distâncias corretas para todos os nós e o caminho até cada um.
 - Conferido à mão (tabelas acima) e compilado sem avisos com `-Wall -Wextra`; rodado sem erros de memória com AddressSanitizer.
 
 **Limitações / o que não funciona:**
@@ -245,6 +219,6 @@ Pontos que merecem destaque:
 - O grafo é **fixo no código** (`main.c`); não há leitura de arquivo nem entrada pelo teclado.
 - O Dijkstra assume **pesos não negativos** (limitação do próprio algoritmo).
 - O Dijkstra escolhe o próximo nó por busca linear, O(V²); não usa fila de prioridade (heap). Para este grafo pequeno isso não importa.
-- Se o grafo fosse desconexo, o Kruskal produziria uma floresta (é avisado na saída) e o Dijkstra mostraria os nós não alcançados como "inalcançável".
+- O programa foi feito para o grafo do enunciado, que é conexo. Se o grafo fosse desconexo, o Kruskal produziria uma floresta (menos de nv−1 arestas) e os nós não alcançados pelo Dijkstra ficariam com distância "infinita", sem tratamento especial na saída.
 - Em caso de empate de pesos, o Kruskal pode gerar outra árvore com o mesmo custo, dependendo da ordem de desempate.
 - O `BitVector` foi copiado como está no slide, que usa `sizeof(int)` (4) como número de bits por `int`. Funciona, pois a mesma conta é usada em todas as funções, mas só aproveita 4 dos 32 bits de cada `int`.

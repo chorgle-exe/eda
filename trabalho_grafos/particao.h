@@ -20,7 +20,6 @@ typedef struct _particao Particao;
 Particao* partCria(int n);                   /* MakeSet para 0..n-1     */
 int       partFind(Particao* p, int x);      /* Find(x)                 */
 int       partUnion(Particao* p, int x, int y); /* Union(x,y)           */
-void      partMostra(Particao* p);           /* [ADICIONADO] depuracao  */
 void      partLibera(Particao* p);           /* [ADICIONADO]            */
 
 #endif

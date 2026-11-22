@@ -93,29 +93,6 @@ void grafoMostraMatriz(Grafo* g) {
    free(mat);
 }
 
-/* [ADICIONADO] Variante da matriz para grafo PONDERADO G=(V,E,p)
- * (PDF 10, slide 7): em vez de 1 guarda o peso p da aresta; 0 = sem aresta. */
-void grafoMostraMatrizPesos(Grafo* g) {
-   int i, j;
-   Viz* p;
-   float** mat = (float**)malloc(g->nv * sizeof(float*));
-   for (i = 0; i < g->nv; i++) {
-      mat[i] = (float*)calloc(g->nv, sizeof(float));
-      for (p = g->viz[i]; p != NULL; p = p->prox)
-         mat[i][p->noj] = p->peso;
-   }
-   printf("     ");
-   for (j = 0; j < g->nv; j++) printf("%3d", j);
-   printf("\n");
-   for (i = 0; i < g->nv; i++) {
-      printf("  %d |", i);
-      for (j = 0; j < g->nv; j++) printf("%3.0f", mat[i][j]);
-      printf("\n");
-      free(mat[i]);
-   }
-   free(mat);
-}
-
 /* [ADICIONADO] Libera toda a memoria do grafo */
 void grafoLibera(Grafo* g) {
    int i;

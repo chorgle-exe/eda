@@ -38,7 +38,6 @@ Grafo* grafoCria(int nv);
 void   grafoInsereAresta(Grafo* g, int a, int b, float peso);
 void   grafoMostraListas(Grafo* g);
 void   grafoMostraMatriz(Grafo* g);
-void   grafoMostraMatrizPesos(Grafo* g);
 void   grafoLibera(Grafo* g);
 
 #endif

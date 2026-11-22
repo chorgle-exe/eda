@@ -62,42 +62,21 @@ int kruskal(Grafo* g, Aresta* arvore, float* custo) {
     * custo" (passo 2) seja simplesmente percorrer o vetor em ordem. */
    qsort(arestas, na, sizeof(Aresta), comparaArestas);
 
-   printf("  Arestas ordenadas por peso:\n   ");
-   for (i = 0; i < na; i++)
-      printf(" %d-%d(%.0f)", arestas[i].u, arestas[i].v, arestas[i].peso);
-   printf("\n\n");
-
    /* [PDF 10, slide 38, passo 1] cada no e uma arvore separada.
     * Implementado com MakeSet do Union-Find [PDF 9, slides 5 e 9]. */
    floresta = partCria(g->nv);
-   printf("  Passo 1: floresta inicial = %d arvores {0} {1} ... {%d}\n\n",
-          g->nv, g->nv - 1);
 
    *custo = 0;
    /* [PDF 10, slide 38, passos 2 e 3] examina a aresta de menor custo e,
-    * se unir duas arvores (Find diferentes), inclui (Union).
+    * se unir duas arvores, inclui. partUnion [PDF 9] faz os Finds e
+    * devolve 0 quando u e v ja estao na mesma arvore (formaria ciclo).
     * Repete ate todos conectados = nv-1 arestas incluidas. */
    for (k = 0; k < na && incluidas < g->nv - 1; k++) {
-      int u = arestas[k].u, v = arestas[k].v;
-      int ru = partFind(floresta, u);   /* [PDF 9] Find */
-      int rv = partFind(floresta, v);
-      printf("  Examina %d-%d (peso %2.0f): Find(%d)=%d, Find(%d)=%d -> ",
-             u, v, arestas[k].peso, u, ru, v, rv);
-      if (partUnion(floresta, u, v)) {  /* [PDF 9] Union */
+      if (partUnion(floresta, arestas[k].u, arestas[k].v)) {
          arvore[incluidas++] = arestas[k];
          *custo += arestas[k].peso;
-         printf("INCLUI   (une duas arvores)   custo parcial = %.0f\n", *custo);
-      } else {
-         printf("REJEITA  (formaria ciclo)\n");
       }
    }
-   /* [ADICIONADO] arestas que nem precisaram ser examinadas */
-   for (; k < na; k++)
-      printf("  %d-%d (peso %2.0f): nao examinada (arvore ja completa)\n",
-             arestas[k].u, arestas[k].v, arestas[k].peso);
-
-   printf("\n  Vetor de pais da particao ao final (PDF 9, slide 15):\n");
-   partMostra(floresta);
 
    partLibera(floresta);
    free(arestas);
@@ -113,26 +92,8 @@ int kruskal(Grafo* g, Aresta* arvore, float* custo) {
  * das listas de adjacencias (vertex, weight, link).
  * ===================================================================== */
 
-/* [ADICIONADO] imprime uma distancia (∞ quando infinita) */
-static void mostraDist(float d) {
-   if (d == INFINITO) printf("  inf");
-   else               printf("%5.0f", d);
-}
-
-/* [ADICIONADO] imprime a tabela dist[] como nas figuras dos slides 7-18 */
-static void mostraTabela(float* dist, BitVector* visitados, int nv) {
-   int i;
-   printf("      vertice:");
-   for (i = 0; i < nv; i++) printf("%5d", i);
-   printf("\n      dist   :");
-   for (i = 0; i < nv; i++) mostraDist(dist[i]);
-   printf("\n      visit. :");
-   for (i = 0; i < nv; i++) printf("%5s", bvGet(visitados, i) ? "x" : ".");
-   printf("\n");
-}
-
 void dijkstra(Grafo* g, int origem, float* dist, int* ant) {
-   int i, corrente, passo = 1;
+   int i, corrente;
    Viz* p;
    /* [PDF EDA_07_Conjuntos, slides 15-17] conjunto de visitados como
     * vetor de bits: bvSet = inserir, bvGet = pertence? */
@@ -151,13 +112,7 @@ void dijkstra(Grafo* g, int origem, float* dist, int* ant) {
     *    corrente (A). (bvInit ja deixou todos os bits em 0 = nao visitado) */
    corrente = origem;
 
-   printf("  Inicio: origem = %d\n", origem);
-   mostraTabela(dist, visitados, g->nv);
-
    while (corrente != -1) {
-      printf("\n  Passo %d: no corrente = %d (dist = %.0f)\n",
-             passo++, corrente, dist[corrente]);
-
       /* 4. Considere a distancia de todos os nos vizinhos nao visitados ao
        *    no corrente e calcule uma distancia deles ao no origem atraves
        *    do no corrente.
@@ -168,21 +123,12 @@ void dijkstra(Grafo* g, int origem, float* dist, int* ant) {
       for (p = g->viz[corrente]; p != NULL; p = p->prox) {
          int b = p->noj;
          float nova;
-         if (bvGet(visitados, b)) {
-            printf("    ignora vertice %d (ja visitado)\n", b);
-            continue;
-         }
+         if (bvGet(visitados, b))
+            continue;                     /* vizinho ja visitado: ignora */
          nova = dist[corrente] + p->peso;                         /* 4.1 */
          if (nova < dist[b]) {                                    /* 4.2 */
-            printf("    modifica distancia do vertice %d: ", b);
-            mostraDist(dist[b]);
-            printf(" -> %.0f  (%.0f + %.0f, via %d)\n",
-                   nova, dist[corrente], p->peso, corrente);
             dist[b] = nova;
             ant[b] = corrente;            /* [ADICIONADO] guarda o caminho */
-         } else {
-            printf("    mantem distancia do vertice %d: %.0f <= %.0f + %.0f\n",
-                   b, dist[b], dist[corrente], p->peso);
          }
       }
 
@@ -190,7 +136,6 @@ void dijkstra(Grafo* g, int origem, float* dist, int* ant) {
        *    marque-o como visitado. Um no visitado nao sera mais verificado;
        *    sua distancia registrada agora e final e minima. */
       bvSet(visitados, corrente);
-      mostraTabela(dist, visitados, g->nv);
 
       /* 6. Se todos os nos tiverem sido visitados, termine.
        *    Caso contrario, marque o no nao visitado com a menor distancia
@@ -206,8 +151,6 @@ void dijkstra(Grafo* g, int origem, float* dist, int* ant) {
              (corrente == -1 || dist[i] < dist[corrente]))
             corrente = i;
    }
-   printf("\n  Nao ha mais vertices nao visitados - FIM!\n");
-   bvShow(visitados, "  Conjunto de visitados = ");
    bvFree(visitados);
 }
 

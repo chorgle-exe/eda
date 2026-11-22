@@ -8,7 +8,6 @@
  * Legenda: [PDF ...] = trecho vindo dos slides | [ADICIONADO] = novo
  * ===================================================================== */
 #include <stdio.h>
-#include <float.h>
 #include "grafo.h"
 #include "algoritmos.h"
 
@@ -41,40 +40,26 @@ int main(void) {
    for (i = 0; i < na; i++)
       grafoInsereAresta(g, ARESTAS[i][0], ARESTAS[i][1], (float)ARESTAS[i][2]);
 
-   printf("==============================================================\n");
-   printf(" 1) REPRESENTACAO DO GRAFO  (%d vertices, %d arestas)\n", g->nv, g->na);
-   printf("==============================================================\n");
-   printf("\nMatriz de adjacencias (1 = ha aresta, 0 = nao ha) [PDF 10, slide 20]:\n");
+   printf("1) MATRIZ DE ADJACENCIAS\n");
    grafoMostraMatriz(g);
-   printf("\nMatriz de adjacencias com pesos (0 = nao ha aresta):\n");
-   grafoMostraMatrizPesos(g);
-   printf("\nListas de adjacencias [PDF 10, slide 26] - (vizinho, peso):\n");
+   printf("\n1) LISTAS DE ADJACENCIAS - (vizinho, peso)\n");
    grafoMostraListas(g);
 
    /* ---------------- 2) Kruskal ---------------- */
-   printf("\n==============================================================\n");
-   printf(" 2) KRUSKAL - ARVORE GERADORA DE CUSTO MINIMO\n");
-   printf("==============================================================\n");
    n = kruskal(g, arvore, &custo);
-   printf("\n  Arvore geradora minima (%d arestas):\n", n);
+   printf("\n2) KRUSKAL - ARVORE GERADORA MINIMA\n");
    for (i = 0; i < n; i++)
-      printf("    %d - %d  (peso %.0f)\n", arvore[i].u, arvore[i].v, arvore[i].peso);
+      printf("  %d - %d  (peso %.0f)\n", arvore[i].u, arvore[i].v, arvore[i].peso);
    printf("  Custo total = %.0f\n", custo);
-   if (n != g->nv - 1)
-      printf("  ATENCAO: grafo desconexo, foi gerada uma floresta.\n");
 
    /* ---------------- 3) Dijkstra ---------------- */
-   printf("\n==============================================================\n");
-   printf(" 3) DIJKSTRA - MENOR DISTANCIA DO NO %d AOS DEMAIS\n", ORIGEM);
-   printf("==============================================================\n");
    dijkstra(g, ORIGEM, dist, ant);
-   printf("\n  Resultado final:\n");
+   printf("\n3) DIJKSTRA - MENOR DISTANCIA DO NO %d AOS DEMAIS\n", ORIGEM);
    for (i = 0; i < NV; i++) {
-      printf("    %d -> %d : ", ORIGEM, i);
-      if (dist[i] == FLT_MAX) { printf("inalcancavel\n"); continue; }
-      printf("distancia %2.0f   caminho: ", dist[i]);
+      if (i == ORIGEM) continue;
+      printf("  %d -> %d : %2.0f   (", ORIGEM, i, dist[i]);
       mostraCaminho(ant, i);
-      printf("\n");
+      printf(")\n");
    }
 
    grafoLibera(g);

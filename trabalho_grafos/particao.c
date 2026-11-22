@@ -79,16 +79,6 @@ int partUnion(Particao* p, int x, int y) {
    return 1;
 }
 
-/* [ADICIONADO] mostra o vetor pai[] como na tabela do slide 15 */
-void partMostra(Particao* p) {
-   int i;
-   printf("      elemento:");
-   for (i = 0; i < p->n; i++) printf("%3d", i);
-   printf("\n      ponteiro:");
-   for (i = 0; i < p->n; i++) printf("%3d", p->pai[i]);
-   printf("\n");
-}
-
 /* [ADICIONADO] */
 void partLibera(Particao* p) {
    free(p->pai);
